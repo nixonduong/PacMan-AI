@@ -48,15 +48,14 @@ class ValueIterationAgent(ValueEstimationAgent):
                 q = []
                 for action in self.mdp.getPossibleActions(state):
                     q.append((self.getQValue(state, action), action))
-                if (len(q) > 0):
-                    maxNode = 0
-                    policy = None
-                    for node, action in q:
-                        if node > maxNode:
-                            maxNode = node
-                            policy = action
-                    self.values[state] = maxNode
-                    self.policy[state] = policy
+                maxNode = 0
+                policy = None
+                for node, action in q:
+                    if node > maxNode:
+                        maxNode = node
+                        policy = action
+                self.values[state] = maxNode
+                self.policy[state] = policy
             iterationK += 1
 
     def getValue(self, state):
