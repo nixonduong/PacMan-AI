@@ -33,17 +33,12 @@ class ValueIterationAgent(ValueEstimationAgent):
 
     def __init__(self, index, mdp, discountRate = 0.9, iters = 100, **kwargs):
         super().__init__(index)
-
         self.mdp = mdp
         self.discountRate = discountRate
         self.iters = iters
         self.values = counter.Counter()  # A Counter is a dict with default 0
         self.policy = {}
         # Compute the values here.
-        # run value iteration for self.iters iterations
-
-
-        # initialize v_0 states with 0
         for state in self.mdp.getStates():
             self.values[state] = 0
             self.policy[state] = None
@@ -52,11 +47,7 @@ class ValueIterationAgent(ValueEstimationAgent):
             for state in self.mdp.getStates():  
                 q = [] 
                 for action in self.mdp.getPossibleActions(state):
-                    node = 0
-                    transitions = self.mdp.getTransitionStatesAndProbs(state, action)
-                    for nextState, probability in transitions:
-                        node += (probability * (self.mdp.getReward(state, action, nextState) + (self.discountRate * self.values[nextState])))
-                    q.append((node, action)) 
+                    q.append((self.getQValue(state, action), action)) 
                 if (len(q) > 0):
                     maxNode = 0
                     policy = None
@@ -72,18 +63,20 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         Return the value of the state (computed in __init__).
         """
-
         return self.values[state]
 
     def getAction(self, state):
         """
         Returns the policy at the state (no exploration).
         """
-
         return self.getPolicy(state)
 
     def getQValue(self, state, action):
-        return (1)
-
+        qVal = 0
+        transitions = self.mdp.getTransitionStatesAndProbs(state, action)
+        for nextState, probability in transitions:
+            qVal += (probability * (self.mdp.getReward(state, action, nextState) + (self.discountRate * self.values[nextState])))
+        return qVal
+    
     def getPolicy(self, state):
         return (self.policy[state])
