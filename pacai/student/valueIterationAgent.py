@@ -45,20 +45,20 @@ class ValueIterationAgent(ValueEstimationAgent):
         iterationK = 1
         while (iterationK <= self.iters):
             for state in self.mdp.getStates():  
-                q = [] 
+                q = []
                 for action in self.mdp.getPossibleActions(state):
-                    q.append((self.getQValue(state, action), action)) 
+                    q.append((self.getQValue(state, action), action))
                 if (len(q) > 0):
                     maxNode = 0
                     policy = None
                     for node, action in q:
                         if node > maxNode:
                             maxNode = node
-                            policy = action 
+                            policy = action
                     self.values[state] = maxNode
                     self.policy[state] = policy
             iterationK += 1
-    
+
     def getValue(self, state):
         """
         Return the value of the state (computed in __init__).
@@ -75,8 +75,10 @@ class ValueIterationAgent(ValueEstimationAgent):
         qVal = 0
         transitions = self.mdp.getTransitionStatesAndProbs(state, action)
         for nextState, probability in transitions:
-            qVal += (probability * (self.mdp.getReward(state, action, nextState) + (self.discountRate * self.values[nextState])))
+            reward = self.mdp.getReward(state, action, nextState)
+            disNextState = self.discountRate * self.values[nextState]
+            qVal += (probability * (reward + disNextState))
         return qVal
-    
+
     def getPolicy(self, state):
         return (self.policy[state])
