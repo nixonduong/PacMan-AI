@@ -38,10 +38,36 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.discountRate = discountRate
         self.iters = iters
         self.values = counter.Counter()  # A Counter is a dict with default 0
-
+        self.policy = {}
         # Compute the values here.
-        raise NotImplementedError()
+        # run value iteration for self.iters iterations
 
+
+        # initialize v_0 states with 0
+        for state in self.mdp.getStates():
+            self.values[state] = 0
+            self.policy[state] = None
+        iterationK = 1
+        while (iterationK <= self.iters):
+            for state in self.mdp.getStates():  
+                q = [] 
+                for action in self.mdp.getPossibleActions(state):
+                    node = 0
+                    transitions = self.mdp.getTransitionStatesAndProbs(state, action)
+                    for nextState, probability in transitions:
+                        node += (probability * (self.mdp.getReward(state, action, nextState) + (self.discountRate * self.values[nextState])))
+                    q.append((node, action)) 
+                if (len(q) > 0):
+                    maxNode = 0
+                    policy = None
+                    for node, action in q:
+                        if node > maxNode:
+                            maxNode = node
+                            policy = action 
+                    self.values[state] = maxNode
+                    self.policy[state] = policy
+            iterationK += 1
+    
     def getValue(self, state):
         """
         Return the value of the state (computed in __init__).
@@ -55,3 +81,9 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
 
         return self.getPolicy(state)
+
+    def getQValue(self, state, action):
+        return (1)
+
+    def getPolicy(self, state):
+        return (self.policy[state])
