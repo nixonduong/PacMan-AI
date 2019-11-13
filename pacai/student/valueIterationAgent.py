@@ -36,33 +36,31 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.mdp = mdp
         self.discountRate = discountRate
         self.iters = iters
-        self.values = counter.Counter()  # A Counter is a dict with default 0
+        self.kthIteration = []
         self.policy = {}
         # Compute the values here.
-        for state in self.mdp.getStates():
-            self.values[state] = 0
-            self.policy[state] = None
+        v_0 = {}
         iterationK = 1
+        for state in self.mdp.getStates():
+            v_0[state] = 0
+        self.kthIteration.append(v_0)
         while (iterationK <= self.iters):
-            for state in self.mdp.getStates():  
-                q = []
+            self.kthIteration.append({})
+            for state in self.mdp.getStates():
+                vList = []
                 for action in self.mdp.getPossibleActions(state):
-                    q.append((self.getQValue(state, action), action))
-                maxNode = 0
-                policy = None
-                for node, action in q:
-                    if node > maxNode:
-                        maxNode = node
-                        policy = action
-                self.values[state] = maxNode
-                self.policy[state] = policy
+                    vList.append(self.getQValue(state, action))
+                if (len(vList) > 0):
+                    self.kthIteration[-1][state] = max(vList)
+                else:
+                    self.kthIteration[-1][state] = self.kthIteration[-2][state]
             iterationK += 1
 
     def getValue(self, state):
         """
         Return the value of the state (computed in __init__).
         """
-        return self.values[state]
+        return self.kthIteration[-1][state]
 
     def getAction(self, state):
         """
@@ -71,13 +69,13 @@ class ValueIterationAgent(ValueEstimationAgent):
         return self.getPolicy(state)
 
     def getQValue(self, state, action):
-        qVal = 0
-        transitions = self.mdp.getTransitionStatesAndProbs(state, action)
-        for nextState, probability in transitions:
+        QValue = 0
+        for nextState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
             reward = self.mdp.getReward(state, action, nextState)
-            disNextState = self.discountRate * self.values[nextState]
-            qVal += (probability * (reward + disNextState))
-        return qVal
+            vNextState = self.kthIteration[-2][nextState]
+            QValue += probability * (reward + (self.discountRate * vNextState))
+        return QValue
 
     def getPolicy(self, state):
-        return (self.policy[state])
+        return ("North")
+        #return (self.policy[state])
