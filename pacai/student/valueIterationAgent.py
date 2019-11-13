@@ -58,7 +58,7 @@ class ValueIterationAgent(ValueEstimationAgent):
                     if qVal > currentMax:
                         currentMax = qVal
                         bestAct = action
-                self.policy[state] = bestAct 
+                self.policy[state] = bestAct
                 if (len(vList) > 0):
                     self.kthIteration[-1][state] = max(vList)
                 else:
