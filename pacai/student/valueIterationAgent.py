@@ -46,6 +46,9 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.kthIteration.append(v_0)
         while (iterationK <= self.iters):
             self.kthIteration.append({})
+            # save memory by keeping k and k+1 in memory only
+            while (len(self.kthIteration) >= 3):
+                del self.kthIteration[0]
             for state in self.mdp.getStates():
                 vList = []
                 bestAct = None
