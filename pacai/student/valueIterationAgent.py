@@ -48,8 +48,15 @@ class ValueIterationAgent(ValueEstimationAgent):
             self.kthIteration.append({})
             for state in self.mdp.getStates():
                 vList = []
+                bestAct = None
+                currentMax = float('-inf')
                 for action in self.mdp.getPossibleActions(state):
-                    vList.append(self.getQValue(state, action))
+                    qVal = self.getQValue(state, action)
+                    vList.append(qVal)
+                    if qVal > currentMax:
+                        currentMax = qVal
+                        bestAct = action 
+                self.policy[state] = bestAct  
                 if (len(vList) > 0):
                     self.kthIteration[-1][state] = max(vList)
                 else:
@@ -77,5 +84,4 @@ class ValueIterationAgent(ValueEstimationAgent):
         return QValue
 
     def getPolicy(self, state):
-        return ("North")
-        #return (self.policy[state])
+        return (self.policy[state])
