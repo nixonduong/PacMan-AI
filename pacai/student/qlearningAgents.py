@@ -1,5 +1,6 @@
 from pacai.agents.learning.reinforcement import ReinforcementAgent
 from pacai.util import reflection
+from pacai.util import counter
 
 class QLearningAgent(ReinforcementAgent):
     """
@@ -46,6 +47,7 @@ class QLearningAgent(ReinforcementAgent):
         super().__init__(index, **kwargs)
 
         # You can initialize Q-values here.
+        self.values = counter.Counter()
 
     def getQValue(self, state, action):
         """
@@ -53,7 +55,8 @@ class QLearningAgent(ReinforcementAgent):
         and `pacai.core.directions.Directions`.
         Should return 0.0 if the (state, action) pair has never been seen.
         """
-
+        if (state, action) in self.values:
+            return self.values[(state, action)]
         return 0.0
 
     def getValue(self, state):
@@ -68,7 +71,11 @@ class QLearningAgent(ReinforcementAgent):
         which returns the actual best action.
         Whereas this method returns the value of the best action.
         """
-
+        qValList = []
+        for action in self.getLegalActions(state):
+            qValList.append(self.getQValue(state, action))
+        if (len(qValList) > 0):
+            return max(qValList)
         return 0.0
 
     def getPolicy(self, state):
@@ -83,8 +90,20 @@ class QLearningAgent(ReinforcementAgent):
         which returns the value of the best action.
         Whereas this method returns the best action itself.
         """
+        value = self.getValue(state)
+        maxAction = None
+        for action in self.getLegalActions(state):
+            if (self.getQValue(state, action) == value):
+                maxAction = action
+        return maxAction
 
-        return None
+    def update(self, state, action, nextState, reward):
+        sample = reward + (self.getDiscountRate() * self.getValue(nextState))
+        movingAverage = ((1 - self.alpha) * (self.values[(state, action)])) + (self.alpha) * sample
+        self.values[(state, action)] = movingAverage
+
+    def getAction(self, state):
+        return self.getPolicy(state)
 
 class PacmanQAgent(QLearningAgent):
     """
