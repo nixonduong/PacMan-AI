@@ -44,9 +44,9 @@ class ValueIterationAgent(ValueEstimationAgent):
             v_0[state] = 0
         self.kthIteration.append(v_0)
         while (iterationK <= self.iters):
-            self.kthIteration.append({})
+            self.kthIteration.append({}) 
             # save memory by keeping k and k+1 in memory only
-            while (len(self.kthIteration) >= 3):
+            while (len(self.kthIteration) > 2):
                 del self.kthIteration[0]
             for state in self.mdp.getStates():
                 vList = []
@@ -60,16 +60,16 @@ class ValueIterationAgent(ValueEstimationAgent):
                         bestAct = action
                 self.policy[state] = bestAct
                 if (len(vList) > 0):
-                    self.kthIteration[-1][state] = max(vList)
+                    self.kthIteration[1][state] = max(vList)
                 else:
-                    self.kthIteration[-1][state] = self.kthIteration[-2][state]
+                    self.kthIteration[1][state] = self.kthIteration[0][state]
             iterationK += 1
 
     def getValue(self, state):
         """
         Return the value of the state (computed in __init__).
         """
-        return self.kthIteration[-1][state]
+        return self.kthIteration[1][state]
 
     def getAction(self, state):
         """
@@ -81,7 +81,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         QValue = 0
         for nextState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
             reward = self.mdp.getReward(state, action, nextState)
-            vNextState = self.kthIteration[-2][nextState]
+            vNextState = self.kthIteration[0][nextState]
             QValue += probability * (reward + (self.discountRate * vNextState))
         return QValue
 
