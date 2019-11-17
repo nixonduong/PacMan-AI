@@ -44,7 +44,7 @@ class ValueIterationAgent(ValueEstimationAgent):
             v_0[state] = 0
         self.kthIteration.append(v_0)
         while (iterationK <= self.iters):
-            self.kthIteration.append({}) 
+            self.kthIteration.append({})
             # save memory by keeping k and k+1 in memory only
             while (len(self.kthIteration) > 2):
                 del self.kthIteration[0]
