@@ -1,6 +1,8 @@
 from pacai.agents.learning.reinforcement import ReinforcementAgent
 from pacai.util import reflection
 from pacai.util import counter
+from pacai.util.probability import flipCoin
+import random
 
 class QLearningAgent(ReinforcementAgent):
     """
@@ -103,6 +105,9 @@ class QLearningAgent(ReinforcementAgent):
         self.values[(state, action)] = movingAverage
 
     def getAction(self, state):
+        if (flipCoin(self.epsilon)):
+            legalActions = self.getLegalActions(state)
+            return random.choice(legalActions) if len(legalActions) else None
         return self.getPolicy(state)
 
 class PacmanQAgent(QLearningAgent):
