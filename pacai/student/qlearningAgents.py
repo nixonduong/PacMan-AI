@@ -158,8 +158,26 @@ class ApproximateQAgent(PacmanQAgent):
             extractor = 'pacai.core.featureExtractors.IdentityExtractor', **kwargs):
         super().__init__(index, **kwargs)
         self.featExtractor = reflection.qualifiedImport(extractor)
-
         # You might want to initialize weights here.
+        self.weights = counter.Counter()
+
+    def getQValue(self, state, action):
+        qVal = 0
+        featureExtractor = self.featExtractor()
+        featureDict = featureExtractor.getFeatures(state, action)
+        for feature in featureDict:
+            f_i = featureDict[feature]
+            qVal += f_i * self.weights[feature]
+        return qVal
+
+    def update(self, state, action, nextState, reward):
+        featureExtractor = self.featExtractor()
+        featureDict = featureExtractor.getFeatures(state, action)
+        correction = reward + (self.getDiscountRate()
+            * self.getValue(nextState)) - self.getQValue(state, action)
+        for feature in featureDict:
+            f_i = featureDict[feature]
+            self.weights[feature] = self.weights[feature] + (self.alpha * correction * f_i)
 
     def final(self, state):
         """
@@ -173,4 +191,4 @@ class ApproximateQAgent(PacmanQAgent):
         if self.episodesSoFar == self.numTraining:
             # You might want to print your weights here for debugging.
             # *** Your Code Here ***
-            raise NotImplementedError()
+            pass
