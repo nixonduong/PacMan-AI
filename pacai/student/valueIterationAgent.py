@@ -36,7 +36,6 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.discountRate = discountRate
         self.iters = iters
         self.kthIteration = []
-        self.policy = {}
         # Compute the values here.
         v_0 = {}
         iterationK = 1
@@ -50,20 +49,15 @@ class ValueIterationAgent(ValueEstimationAgent):
                 del self.kthIteration[0]
             for state in self.mdp.getStates():
                 vList = []
-                bestAct = None
-                currentMax = float('-inf')
                 for action in self.mdp.getPossibleActions(state):
                     qVal = self.getQValue(state, action)
                     vList.append(qVal)
-                    if qVal > currentMax:
-                        currentMax = qVal
-                        bestAct = action
-                self.policy[state] = bestAct
                 if (len(vList) > 0):
                     self.kthIteration[1][state] = max(vList)
                 else:
                     self.kthIteration[1][state] = self.kthIteration[0][state]
             iterationK += 1
+        self.kthIteration[0] = self.kthIteration[1].copy()
 
     def getValue(self, state):
         """
@@ -86,4 +80,10 @@ class ValueIterationAgent(ValueEstimationAgent):
         return QValue
 
     def getPolicy(self, state):
-        return (self.policy[state])
+        maxVal = float('-inf')
+        maxAct = None
+        for action in self.mdp.getPossibleActions(state):
+            if self.getQValue(state, action) > maxVal:
+                maxVal = self.getQValue(state, action)
+                maxAct = action
+        return maxAct
